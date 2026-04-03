@@ -3,6 +3,27 @@ const html = document.documentElement;
 const navLinks = document.querySelectorAll('.nav-link');
 const pages = document.querySelectorAll('.page');
 
+// ── API Helper ──────────────────────────────────
+const API = 'http://localhost:3000/api';
+
+function getToken() { return localStorage.getItem('authToken'); }
+function setToken(t) { localStorage.setItem('authToken', t); }
+function clearToken() { localStorage.removeItem('authToken'); }
+
+async function api(method, endpoint, body) {
+    const opts = {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+    };
+    const token = getToken();
+    if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+    if (body)  opts.body = JSON.stringify(body);
+    const res = await fetch(API + endpoint, opts);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+}
+
 const authScreen = document.getElementById('authScreen');
 const appScreen = document.getElementById('appScreen');
 const loginFormElement = document.getElementById('loginFormElement');
@@ -196,17 +217,8 @@ if (userLoginBtn && adminLoginBtn) {
 
 if (userRegisterBtn && adminRegisterBtn) {
     userRegisterBtn.classList.add('active');
-    
     userRegisterBtn.addEventListener('click', () => {
-        userRegisterBtn.classList.add('active');
-        adminRegisterBtn.classList.remove('active');
         registerRoleInput.value = 'user';
-    });
-    
-    adminRegisterBtn.addEventListener('click', () => {
-        adminRegisterBtn.classList.add('active');
-        userRegisterBtn.classList.remove('active');
-        registerRoleInput.value = 'admin';
     });
 }
 
@@ -271,16 +283,7 @@ showLogin.addEventListener('click', (e) => {
 });
 
 logoutBtn.addEventListener('click', () => {
-    const sessionData = {
-        sessionStart: storage.session.get('sessionStart'),
-        sessionEnd: new Date().toISOString(),
-        lastPage: storage.session.get('lastVisited')
-    };
-    
-    const sessions = storage.local.get('sessions', []);
-    sessions.push(sessionData);
-    storage.local.set('sessions', sessions);
-    
+    clearToken();
     storage.local.remove('currentUser');
     sessionStorage.clear();
     checkAuth();
@@ -349,89 +352,74 @@ function validateAuthField(field) {
     });
 });
 
-loginFormElement.addEventListener('submit', (e) => {
+loginFormElement.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
     let isValid = true;
     loginFormElement.querySelectorAll('input:not([type="hidden"])').forEach(field => {
         if (!validateAuthField(field)) isValid = false;
     });
-    
-    if (isValid) {
-        const name = document.getElementById('loginName').value;
-        const password = document.getElementById('loginPassword').value;
-        const role = document.getElementById('loginRole').value;
-        const captchaInput = document.getElementById('captchaInput').value.toUpperCase();
-        const users = storage.local.get('users', []);
-        
-        if (captchaInput !== currentCaptcha) {
-            const captchaField = document.getElementById('captchaInput');
-            captchaField.classList.add('error');
-            captchaField.parentElement.querySelector('.error-message').textContent = 'Invalid CAPTCHA';
-            generateCaptcha();
-            return;
-        }
-        
-        const user = users.find(u => u.name === name && u.password === password && u.role === role);
-        
-        if (user) {
-            storage.local.set('currentUser', user);
-            storage.local.set('lastLogin', new Date().toISOString());
-            loginFormElement.reset();
-            loginFormElement.querySelectorAll('input').forEach(f => f.classList.remove('success', 'error'));
-            setTimeout(() => showSparkleWelcome(user.role), 500);
-            adminLoginBtn.classList.remove('active');
-            loginRoleInput.value = 'user';
-            generateCaptcha();
-            checkAuth();
-            setTimeout(() => { _renderBell(); _renderPanel(); }, 300);
-        } else {
-            const nameField = document.getElementById('loginName');
-            nameField.classList.add('error');
-            nameField.parentElement.querySelector('.error-message').textContent = 'Invalid credentials for selected login type';
-            generateCaptcha();
-        }
+    if (!isValid) return;
+
+    const name = document.getElementById('loginName').value;
+    const password = document.getElementById('loginPassword').value;
+    const role = document.getElementById('loginRole').value;
+    const captchaInput = document.getElementById('captchaInput').value.toUpperCase();
+
+    if (captchaInput !== currentCaptcha) {
+        const captchaField = document.getElementById('captchaInput');
+        captchaField.classList.add('error');
+        captchaField.parentElement.querySelector('.error-message').textContent = 'Invalid CAPTCHA';
+        generateCaptcha();
+        return;
+    }
+
+    try {
+        const data = await api('POST', '/login', { name, password, role });
+        setToken(data.token);
+        storage.local.set('currentUser', data.user);
+        storage.local.set('lastLogin', new Date().toISOString());
+        loginFormElement.reset();
+        loginFormElement.querySelectorAll('input').forEach(f => f.classList.remove('success', 'error'));
+        adminLoginBtn.classList.remove('active');
+        loginRoleInput.value = 'user';
+        generateCaptcha();
+        setTimeout(() => showSparkleWelcome(data.user.role), 500);
+        checkAuth();
+        setTimeout(() => { _renderBell(); _renderPanel(); }, 300);
+    } catch (err) {
+        const nameField = document.getElementById('loginName');
+        nameField.classList.add('error');
+        nameField.parentElement.querySelector('.error-message').textContent = err.message || 'Invalid credentials';
+        generateCaptcha();
     }
 });
 
-registerFormElement.addEventListener('submit', (e) => {
+registerFormElement.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
     let isValid = true;
     registerFormElement.querySelectorAll('input').forEach(field => {
         if (!validateAuthField(field)) isValid = false;
     });
-    
-    if (isValid) {
-        const name = document.getElementById('regName').value;
-        const phone = document.getElementById('regPhone').value;
-        const password = document.getElementById('regPassword').value;
-        const role = document.getElementById('registerRole').value;
-        
-        const users = storage.local.get('users', []);
-        
-        if (users.find(u => u.name === name)) {
-            const nameField = document.getElementById('regName');
-            nameField.classList.add('error');
-            nameField.parentElement.querySelector('.error-message').textContent = 'Name already registered';
-            return;
-        }
-        
-        if (users.find(u => u.phone === phone)) {
-            const phoneField = document.getElementById('regPhone');
-            phoneField.classList.add('error');
-            phoneField.parentElement.querySelector('.error-message').textContent = 'Phone number already registered';
-            return;
-        }
-        
-        const newUser = { name, phone, password, role: role, registeredAt: new Date().toISOString() };
-        users.push(newUser);
-        storage.local.set('users', users);
-        storage.local.set('currentUser', newUser);
-        
+    if (!isValid) return;
+
+    const name = document.getElementById('regName').value;
+    const phone = document.getElementById('regPhone').value;
+    const password = document.getElementById('regPassword').value;
+    const role = document.getElementById('registerRole').value;
+
+    try {
+        await api('POST', '/register', { name, phone, password, role });
+        // Auto login after register
+        const data = await api('POST', '/login', { name, password, role });
+        setToken(data.token);
+        storage.local.set('currentUser', data.user);
         registerFormElement.reset();
         registerFormElement.querySelectorAll('input').forEach(f => f.classList.remove('success', 'error'));
         checkAuth();
+    } catch (err) {
+        const nameField = document.getElementById('regName');
+        nameField.classList.add('error');
+        nameField.parentElement.querySelector('.error-message').textContent = err.message || 'Registration failed';
     }
 });
 
@@ -513,9 +501,8 @@ if (draft) {
     document.getElementById('description').value = draft.description || '';
 }
 
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
     let isValid = true;
     form.querySelectorAll('input, select, textarea').forEach(field => {
         if (field.type === 'file') return;
@@ -523,42 +510,42 @@ form.addEventListener('submit', (e) => {
         if (stepContent && !stepContent.classList.contains('active')) return;
         if (!validateField(field)) isValid = false;
     });
-    
-    if (isValid) {
-        const currentUser = storage.local.get('currentUser');
-        const issue = {
-            id: Date.now(),
-            name: document.getElementById('name').value,
-            userName: currentUser ? currentUser.name : document.getElementById('name').value,
-            phone: document.getElementById('phone').value,
-            category: document.getElementById('category').value,
-            location: document.getElementById('location').value,
-            description: document.getElementById('description').value,
-            photo: window._issuePhotoData || null,
-            status: 'pending',
-            priority: 'medium',
-            date: new Date().toLocaleDateString(),
-            createdAt: new Date().toISOString()
-        };
+    if (!isValid) return;
+
+    const currentUser = storage.local.get('currentUser');
+    const issueData = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        category: document.getElementById('category').value,
+        location: document.getElementById('location').value,
+        description: document.getElementById('description').value,
+        photo: window._issuePhotoData || null
+    };
+
+    try {
+        const data = await api('POST', '/issues', issueData);
         window._issuePhotoData = null;
-        
+
+        // Also keep in localStorage for offline display
+        const issue = { ...issueData, id: data.id, userName: currentUser?.name,
+            status: 'pending', priority: 'medium',
+            date: new Date().toLocaleDateString(), createdAt: new Date().toISOString() };
         const issues = storage.local.get('issues', []);
         issues.push(issue);
         storage.local.set('issues', issues);
-        
+
         updateNotificationBadge();
-        notifyIssueSubmitted(issue.category, issue.location);
-        
+        notifyIssueSubmitted(issueData.category, issueData.location);
         clearFormDraft('reportForm');
-        
-        const refId = 'SC' + issue.id.toString().slice(-8);
+
+        const refId = 'SC' + String(data.id).padStart(8, '0');
         document.getElementById('refId').textContent = refId;
-        
         form.style.display = 'none';
         successMessage.classList.remove('hidden');
-        successMessage.classList.remove('report-success');
         successMessage.classList.add('report-success');
         _loadReportMiniStats();
+    } catch (err) {
+        alert('Failed to submit: ' + err.message);
     }
 });
 
@@ -598,8 +585,12 @@ function startLiveClock() {
     setInterval(updateActiveUsers, 5000);
 }
 
-function renderAlerts() {
+async function renderAlerts() {
     const alertsList = document.getElementById('alertsList');
+    try {
+        const apiAlerts = await api('GET', '/alerts');
+        storage.local.set('alerts', apiAlerts.map(a => ({ ...a, time: a.time })));
+    } catch(e) {}
     const alerts = storage.local.get('alerts', [
         { id: 1, type: 'warning', message: 'Heavy traffic on Main St', time: Date.now() - 300000 },
         { id: 2, type: 'info', message: 'Street cleaning scheduled', time: Date.now() - 3600000 },
@@ -1111,16 +1102,25 @@ alertForm.addEventListener('submit', (e) => {
     if (!id) notifyNewAlert(message, type);
 });
 
-function renderIssues() {
+async function renderIssues() {
     const issuesList = document.getElementById('issuesList');
     const emptyState = document.getElementById('emptyState');
-    const issues = storage.local.get('issues', []);
     const user = storage.local.get('currentUser');
-
     if (!user) { issuesList.innerHTML = ''; emptyState.classList.remove('hidden'); return; }
+    try {
+        const apiIssues = await api('GET', '/issues');
+        const all = storage.local.get('issues', []);
+        apiIssues.forEach(i => {
+            const merged = { ...i, userName: i.user_name, date: new Date(i.created_at).toLocaleDateString(), createdAt: i.created_at, solutionViewed: !!i.solution_viewed, resolvedViewed: !!i.resolved_viewed };
+            const idx = all.findIndex(x => x.id === i.id);
+            if (idx === -1) all.push(merged); else all[idx] = merged;
+        });
+        storage.local.set('issues', all);
+    } catch(e) {}
+    const issues = storage.local.get('issues', []);
 
     storage.session.set('issuesViewedAt', new Date().toISOString());
-    let userIssues = issues.filter(i => i.userName === user.name || i.name === user.name);
+    let userIssues = issues.filter(i => i.userName === user.name || i.name === user.name || i.user_name === user.name);
 
     userIssues.forEach(issue => {
         if (issue.solution) issue.solutionViewed = true;
@@ -1475,7 +1475,17 @@ function renderUserEmergencyNumbers() {
     `).join('');
 }
 
-function renderAdminPanel() {
+async function renderAdminPanel() {
+    try {
+        const apiIssues = await api('GET', '/issues');
+        const all = storage.local.get('issues', []);
+        apiIssues.forEach(i => {
+            const merged = { ...i, userName: i.user_name, date: new Date(i.created_at).toLocaleDateString(), createdAt: i.created_at };
+            const idx = all.findIndex(x => x.id === i.id);
+            if (idx === -1) all.push(merged); else all[idx] = merged;
+        });
+        storage.local.set('issues', all);
+    } catch(e) {}
     const allIssues = storage.local.get('issues', []);
     const users = storage.local.get('users', []);
     const places = storage.local.get('touristPlaces', []);
@@ -1546,19 +1556,12 @@ function renderAdminPanel() {
     `).join('');
 }
 
-window.resolveIssue = function(id) {
+window.resolveIssue = async function(id) {
+    try { await api('PUT', '/issues/' + id, { status: 'resolved' }); } catch(e) {}
     let issues = storage.local.get('issues', []);
     const index = issues.findIndex(i => i.id === id);
-    if (index !== -1) {
-        issues[index].status = 'resolved';
-        issues[index].resolvedAt = new Date().toISOString();
-        issues[index].resolvedViewed = false;
-        storage.local.set('issues', issues);
-        renderAdminPanel();
-        renderIssues();
-        updateNotificationBadge();
-        notifyIssueUpdated('resolved', issues[index].category);
-    }
+    if (index !== -1) { issues[index].status = 'resolved'; issues[index].resolvedViewed = false; storage.local.set('issues', issues); notifyIssueUpdated('resolved', issues[index].category); }
+    renderAdminPanel(); renderIssues(); updateNotificationBadge();
 };
 
 window.addSolution = function(id) {
@@ -1578,18 +1581,16 @@ window.addSolution = function(id) {
     }
 };
 
-window.completeIssue = function(id) {
+window.completeIssue = async function(id) {
+    try { await api('PUT', '/issues/' + id, { status: 'completed' }); } catch(e) {}
     let issues = storage.local.get('issues', []);
     const index = issues.findIndex(i => i.id === id);
-    if (index !== -1) {
-        issues[index].status = 'completed';
-        issues[index].completedAt = new Date().toISOString();
-        storage.local.set('issues', issues);
-        renderAdminPanel();
-    }
+    if (index !== -1) { issues[index].status = 'completed'; storage.local.set('issues', issues); }
+    renderAdminPanel();
 };
 
-window.adminDeleteIssue = function(id) {
+window.adminDeleteIssue = async function(id) {
+    try { await api('DELETE', '/issues/' + id); } catch(e) {}
     let issues = storage.local.get('issues', []);
     issues = issues.filter(i => i.id !== id);
     storage.local.set('issues', issues);
@@ -2267,6 +2268,10 @@ async function fetchWeather() {
 
 async function fetchTransport() {
     const transportList = document.getElementById('transportList');
+    try {
+        const apiBuses = await api('GET', '/buses');
+        storage.local.set('buses', apiBuses);
+    } catch(e) {}
     const buses = storage.local.get('buses', []);
     
     if (buses.length === 0) {
@@ -2976,12 +2981,13 @@ document.getElementById('closeSolutionModal').addEventListener('click', () => {
     document.getElementById('solutionModal').classList.add('hidden');
 });
 
-document.getElementById('solutionForm').addEventListener('submit', function(e) {
+document.getElementById('solutionForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const id = parseInt(document.getElementById('solutionIssueId').value);
     const solution = document.getElementById('solutionText').value.trim();
     const priority = document.getElementById('solutionPriority').value;
     if (!solution) return;
+    try { await api('PUT', '/issues/' + id, { solution, priority }); } catch(e) {}
     let issues = storage.local.get('issues', []);
     const index = issues.findIndex(i => i.id === id);
     if (index !== -1) {
@@ -2989,11 +2995,9 @@ document.getElementById('solutionForm').addEventListener('submit', function(e) {
         issues[index].priority = priority;
         issues[index].solutionViewed = false;
         storage.local.set('issues', issues);
-        renderAdminPanel();
-        renderIssues();
-        updateNotificationBadge();
         notifyIssueUpdated('in-progress', issues[index].category);
     }
+    renderAdminPanel(); renderIssues(); updateNotificationBadge();
     document.getElementById('solutionModal').classList.add('hidden');
 });
 

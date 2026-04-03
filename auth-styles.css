@@ -2,7 +2,7 @@
 .auth-screen {
     display: flex;
     min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #efefef 0%, #ff0fff 100%);
     background-image: url('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1920');
     background-size: cover;
     background-position: center;
@@ -240,7 +240,7 @@
 .btn-primary {
     width: 100%;
     padding: 0.9rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
     color: white;
     border: none;
     border-radius: 10px;
@@ -259,7 +259,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, #667eea, #764ba2, #667eea, #764ba2);
+    background: linear-gradient(45deg, #1d4ed8, #3b82f6, #1d4ed8, #3b82f6);
     background-size: 400% 400%;
     border-radius: 10px;
     z-index: -1;
@@ -271,15 +271,9 @@
     opacity: 1;
 }
 
-@keyframes glitterButton {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.5);
 }
 
 .auth-switch {

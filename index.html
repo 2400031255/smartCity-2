@@ -15,14 +15,14 @@
             padding: 0 16px !important;
             font-size: 1rem !important;
             background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,245,255,0.95)) !important;
-            color: #1e293b !important;
+            color: #1d4481 !important;
             border-radius: 10px !important;
             box-sizing: border-box !important;
             line-height: 48px !important;
             min-height: unset !important;
             max-height: 48px !important;
-            border: 2px solid rgba(255,255,255,0.4) !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            border: 2px solid rgba(224, 214, 214, 0.4) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
         }
     </style>
 </head>
@@ -78,17 +78,6 @@
 
             <div id="registerForm" class="auth-form">
                 <h2>Create Account</h2>
-                
-                <div class="login-type-selector">
-                    <div class="login-type-btn active" id="userRegisterBtn" data-type="user">
-                        <span class="icon">👤</span>
-                        <span class="label">User Signup</span>
-                    </div>
-                    <div class="login-type-btn" id="adminRegisterBtn" data-type="admin">
-                        <span class="icon">🔒</span>
-                        <span class="label">Admin Signup</span>
-                    </div>
-                </div>
                 
                 <form id="registerFormElement" novalidate>
                     <input type="hidden" id="registerRole" value="user">
