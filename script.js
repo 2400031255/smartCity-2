@@ -77,6 +77,9 @@ function checkAuth() {
     const user = storage.local.get('currentUser');
     if (user) {
         authScreen.style.display = 'none';
+        document.getElementById('authPortal').style.display = 'none';
+        document.getElementById('userAuthPanel').style.display = 'none';
+        document.getElementById('adminAuthPanel').style.display = 'none';
         appScreen.classList.remove('hidden');
         userName.textContent = user.name;
         userRole.textContent = user.role || 'user';
@@ -116,6 +119,9 @@ function checkAuth() {
         }
         setTimeout(() => { _renderBell(); _renderPanel(); }, 400);
     } else {
+        document.getElementById('authPortal').style.display = 'flex';
+        document.getElementById('userAuthPanel').style.display = 'none';
+        document.getElementById('adminAuthPanel').style.display = 'none';
         authScreen.style.display = 'flex';
         appScreen.classList.add('hidden');
     }
@@ -125,8 +131,7 @@ checkAuth();
 
 if (!storage.local.get('users')) {
     storage.local.set('users', [
-        { name: 'nikhil', phone: '0000000000', password: 'nikhil2006', role: 'admin', registeredAt: new Date().toISOString() },
-        { name: 'nikhil', phone: '0000000000', password: 'nikhil2006', role: 'user', registeredAt: new Date().toISOString() }
+        { name: 'nikhil', phone: '0000000000', password: 'nikhil2006', role: 'admin', registeredAt: new Date().toISOString() }
     ]);
 }
 
@@ -191,36 +196,57 @@ if (!storage.local.get('touristPlaces')) {
     ]);
 }
 
-const userLoginBtn = document.getElementById('userLoginBtn');
-const adminLoginBtn = document.getElementById('adminLoginBtn');
-const loginRoleInput = document.getElementById('loginRole');
+// Portal navigation
+window.showAuthPanel = function(type) {
+    document.getElementById('authPortal').style.display = 'none';
+    if (type === 'user') {
+        document.getElementById('userAuthPanel').style.display = 'flex';
+        document.getElementById('adminAuthPanel').style.display = 'none';
+    } else {
+        document.getElementById('adminAuthPanel').style.display = 'flex';
+        document.getElementById('userAuthPanel').style.display = 'none';
+        generateAdminCaptcha();
+    }
+};
 
-const userRegisterBtn = document.getElementById('userRegisterBtn');
-const adminRegisterBtn = document.getElementById('adminRegisterBtn');
+window.showPortal = function() {
+    document.getElementById('authPortal').style.display = 'flex';
+    document.getElementById('userAuthPanel').style.display = 'none';
+    document.getElementById('adminAuthPanel').style.display = 'none';
+};
+
+// Spawn floating particles
+(function spawnParticles() {
+    const container = document.getElementById('authParticles');
+    if (!container) return;
+    const colors = ['#ffd700','#ff8c00','#ff4500','#ff69b4','#00ffcc','#ffffff','#ffec8b'];
+    function createParticle() {
+        const p = document.createElement('div');
+        p.className = 'auth-particle';
+        const size = Math.random() * 6 + 2;
+        p.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random()*100}%;
+            background:${colors[Math.floor(Math.random()*colors.length)]};
+            animation-duration:${Math.random()*10+8}s;
+            animation-delay:${Math.random()*5}s;
+            box-shadow:0 0 ${size*2}px currentColor;
+        `;
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 18000);
+    }
+    for (let i = 0; i < 20; i++) setTimeout(createParticle, i * 300);
+    setInterval(createParticle, 800);
+
+    // Update portal user count
+    const countEl = document.getElementById('portalUserCount');
+    if (countEl) {
+        const users = storage.local.get('users', []);
+        countEl.textContent = (users.length || 0) + '+';
+    }
+})();
+
 const registerRoleInput = document.getElementById('registerRole');
-
-if (userLoginBtn && adminLoginBtn) {
-    userLoginBtn.classList.add('active');
-    
-    userLoginBtn.addEventListener('click', () => {
-        userLoginBtn.classList.add('active');
-        adminLoginBtn.classList.remove('active');
-        loginRoleInput.value = 'user';
-    });
-    
-    adminLoginBtn.addEventListener('click', () => {
-        adminLoginBtn.classList.add('active');
-        userLoginBtn.classList.remove('active');
-        loginRoleInput.value = 'admin';
-    });
-}
-
-if (userRegisterBtn && adminRegisterBtn) {
-    userRegisterBtn.classList.add('active');
-    userRegisterBtn.addEventListener('click', () => {
-        registerRoleInput.value = 'user';
-    });
-}
 
 const savedTheme = storage.local.get('theme', 'dark');
 html.setAttribute('data-theme', savedTheme);
@@ -319,11 +345,57 @@ function generateCaptcha() {
 
 // Bind refresh button and generate on load
 document.getElementById('refreshCaptcha')?.addEventListener('click', generateCaptcha);
-document.addEventListener('DOMContentLoaded', () => {
-    generateCaptcha();
-});
+document.addEventListener('DOMContentLoaded', () => { generateCaptcha(); });
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
     setTimeout(generateCaptcha, 100);
+}
+
+// Admin captcha
+let currentAdminCaptcha = '';
+function generateAdminCaptcha() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let c = '';
+    for (let i = 0; i < 6; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
+    currentAdminCaptcha = c;
+    const el = document.getElementById('adminCaptchaCode');
+    if (el) el.textContent = c;
+}
+document.getElementById('adminRefreshCaptcha')?.addEventListener('click', generateAdminCaptcha);
+
+// Admin login form
+const adminLoginFormElement = document.getElementById('adminLoginFormElement');
+if (adminLoginFormElement) {
+    adminLoginFormElement.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('adminLoginName').value.trim();
+        const password = document.getElementById('adminLoginPassword').value;
+        const captchaInput = document.getElementById('adminCaptchaInput').value.toUpperCase();
+        const nameField = document.getElementById('adminLoginName');
+        const captchaField = document.getElementById('adminCaptchaInput');
+
+        if (!name) { nameField.classList.add('error'); nameField.parentElement.querySelector('.error-message').textContent = 'Username required'; return; }
+        if (!password) { document.getElementById('adminLoginPassword').classList.add('error'); document.getElementById('adminLoginPassword').parentElement.querySelector('.error-message').textContent = 'Password required'; return; }
+        if (captchaInput !== currentAdminCaptcha) {
+            captchaField.classList.add('error');
+            captchaField.parentElement.querySelector('.error-message').textContent = 'Invalid CAPTCHA';
+            generateAdminCaptcha();
+            return;
+        }
+        try {
+            const data = await api('POST', '/login', { name, password, role: 'admin' });
+            setToken(data.token);
+            storage.local.set('currentUser', data.user);
+            adminLoginFormElement.reset();
+            generateAdminCaptcha();
+            setTimeout(() => showSparkleWelcome('admin'), 500);
+            checkAuth();
+            setTimeout(() => { _renderBell(); _renderPanel(); }, 300);
+        } catch (err) {
+            nameField.classList.add('error');
+            nameField.parentElement.querySelector('.error-message').textContent = err.message || 'Invalid credentials';
+            generateAdminCaptcha();
+        }
+    });
 }
 
 
@@ -380,8 +452,6 @@ loginFormElement.addEventListener('submit', async (e) => {
         storage.local.set('lastLogin', new Date().toISOString());
         loginFormElement.reset();
         loginFormElement.querySelectorAll('input').forEach(f => f.classList.remove('success', 'error'));
-        adminLoginBtn.classList.remove('active');
-        loginRoleInput.value = 'user';
         generateCaptcha();
         setTimeout(() => showSparkleWelcome(data.user.role), 500);
         checkAuth();

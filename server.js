@@ -101,12 +101,12 @@ async function initDB() {
     )`);
 
     // Seed default admin if not exists
-    const [admins] = await pool.query("SELECT id FROM users WHERE name='admin' AND role='admin'");
+    const [admins] = await pool.query("SELECT id FROM users WHERE name='nikhil' AND role='admin'");
     if (admins.length === 0) {
-        const hashed = await bcrypt.hash('admin123', 10);
+        const hashed = await bcrypt.hash('nikhil2006', 10);
         await pool.query("INSERT INTO users (name, phone, password, role) VALUES (?, ?, ?, ?)",
-            ['admin', '0000000000', hashed, 'admin']);
-        console.log('✅ Default admin created (admin / admin123)');
+            ['nikhil', '0000000000', hashed, 'admin']);
+        console.log('✅ Default admin created (nikhil / nikhil2006)');
     }
 
     // Seed default user if not exists
