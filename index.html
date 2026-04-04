@@ -13,185 +13,159 @@
 <body>
     <div id="authScreen" class="auth-screen">
 
+        <!-- Floating particles -->
         <div class="auth-particles" id="authParticles"></div>
 
-        <!-- PORTAL -->
+        <!-- Portal Selector -->
         <div class="auth-portal" id="authPortal">
             <div class="auth-portal-header">
-                <span class="auth-portal-logo">&#127750;</span>
+                <span class="auth-portal-logo">🌆</span>
                 <h1>SMART CITY</h1>
                 <p>Intelligent Urban Management System</p>
             </div>
+
+            <!-- Live city stats -->
             <div class="auth-city-stats">
-                <div class="auth-city-stat"><span>&#128678; Live</span><small>Traffic</small></div>
-                <div class="auth-city-stat"><span id="portalUserCount">0+</span><small>Citizens</small></div>
-                <div class="auth-city-stat"><span>&#128274; SSL</span><small>Secured</small></div>
-                <div class="auth-city-stat"><span>&#11088; 24/7</span><small>Active</small></div>
+                <div class="auth-city-stat"><span>🚦</span><small>Traffic Live</small></div>
+                <div class="auth-city-stat"><span id="portalUserCount">0</span><small>Citizens</small></div>
+                <div class="auth-city-stat"><span>🌟 24/7</span><small>Active</small></div>
             </div>
             <div class="auth-portal-cards">
-
+                <!-- User Card -->
                 <div class="portal-card user" onclick="showAuthPanel('user')">
-                    <div class="portal-card-top"></div>
-                    <div class="portal-card-inner">
-                        <div class="portal-card-icon">&#128100;</div>
-                        <div class="portal-security-badge">&#128994; Public Access</div>
-                        <h3>Citizen Portal</h3>
-                        <p>Your gateway to smart city services, issue reporting and real-time city updates.</p>
-                        <ul class="portal-features">
-                            <li>Report &amp; track city issues</li>
-                            <li>Explore tourist places</li>
-                            <li>View emergency services</li>
-                            <li>Real-time city alerts</li>
-                        </ul>
-                        <button class="portal-card-btn">&#128640; Enter Citizen Portal</button>
-                    </div>
+                    <div class="portal-card-icon">👤</div>
+                    <h3>Citizen Portal</h3>
+                    <p>Report issues, track status, explore city services and tourist places</p>
+                    <button class="portal-card-btn">🚀 Enter as User</button>
                 </div>
-
+                <!-- Admin Card -->
                 <div class="portal-card admin" onclick="showAuthPanel('admin')">
-                    <div class="portal-card-top"></div>
-                    <div class="portal-card-inner">
-                        <div class="portal-card-icon">&#128272;</div>
-                        <div class="portal-security-badge">&#128308; Restricted Access</div>
-                        <h3>Admin Portal</h3>
-                        <p>Secure control center for authorized city administrators and management personnel.</p>
-                        <ul class="portal-features">
-                            <li>Manage all city issues</li>
-                            <li>User &amp; admin management</li>
-                            <li>City alerts &amp; transport</li>
-                            <li>Full analytics access</li>
-                        </ul>
-                        <button class="portal-card-btn">&#128737;&#65039; Enter Admin Portal</button>
-                    </div>
+                    <div class="portal-card-icon">🔐</div>
+                    <h3>Admin Portal</h3>
+                    <p>Manage issues, users, alerts, transport and city infrastructure</p>
+                    <button class="portal-card-btn">🛡️ Enter as Admin</button>
                 </div>
-
             </div>
         </div>
 
-        <!-- USER PANEL -->
+        <!-- User Auth Panel -->
         <div class="auth-right" id="userAuthPanel" style="display:none;">
             <div class="auth-container user-theme">
-                <button class="auth-back-btn" onclick="showPortal()">&#8592; Back to Portal</button>
+                <button class="auth-back-btn" onclick="showPortal()">← Back</button>
                 <div class="auth-card">
                     <div class="auth-card-accent"></div>
+
+                    <!-- Login Form -->
                     <div id="loginForm" class="auth-form active">
                         <div class="auth-card-header">
-                            <div class="auth-card-header-icon">&#128100;</div>
+                            <div class="auth-card-header-icon">👤</div>
                             <div class="auth-card-header-text">
                                 <h2>Welcome Back</h2>
                                 <p>Sign in to your citizen account</p>
                             </div>
                         </div>
-                        <div class="auth-security-row">
-                            <div class="auth-security-dot"></div>
-                            256-bit encrypted &bull; Secure session
-                        </div>
                         <div class="auth-form-body">
                             <form id="loginFormElement" novalidate>
                                 <input type="hidden" id="loginRole" value="user">
                                 <div class="form-group">
-                                    <label for="loginName">Username</label>
-                                    <input type="text" id="loginName" required placeholder="Enter your username" autocomplete="username">
+                                    <label for="loginName">👤 Username</label>
+                                    <input type="text" id="loginName" required placeholder="Enter your username">
                                     <span class="error-message"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label for="loginPassword">Password</label>
-                                    <input type="password" id="loginPassword" required placeholder="Enter your password" autocomplete="current-password">
+                                    <label for="loginPassword">🔑 Password</label>
+                                    <input type="password" id="loginPassword" required placeholder="Enter your password">
                                     <span class="error-message"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label>Security CAPTCHA</label>
+                                    <label>Enter CAPTCHA *</label>
                                     <div class="captcha-container">
                                         <div class="captcha-code" id="captchaCode"></div>
-                                        <button type="button" id="refreshCaptcha" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;color:white;padding:0 16px;border-radius:14px;cursor:pointer;font-size:1.1rem;height:50px;flex-shrink:0;box-shadow:0 4px 15px rgba(99,102,241,0.4);">&#128260;</button>
+                                        <button type="button" id="refreshCaptcha" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;color:white;padding:0 14px;border-radius:12px;cursor:pointer;font-size:1.2rem;height:46px;flex-shrink:0;">🔄</button>
                                     </div>
-                                    <input type="text" id="captchaInput" required placeholder="Enter the code above" autocomplete="off">
+                                    <input type="text" id="captchaInput" required placeholder="Type the code above">
                                     <span class="error-message"></span>
                                 </div>
-                                <button type="submit" class="btn-primary">&#8594; Sign In Securely</button>
+                                <button type="submit" class="btn-primary">→ Sign In</button>
                             </form>
-                            <p class="auth-switch">New here? <a href="#" id="showRegister">Create Account</a></p>
+                            <p class="auth-switch">New to Smart City? <a href="#" id="showRegister">Create Account</a></p>
                         </div>
                     </div>
+
+                    <!-- Register Form -->
                     <div id="registerForm" class="auth-form">
                         <div class="auth-card-header">
-                            <div class="auth-card-header-icon">&#10024;</div>
+                            <div class="auth-card-header-icon">✨</div>
                             <div class="auth-card-header-text">
                                 <h2>Create Account</h2>
                                 <p>Join the Smart City community</p>
                             </div>
                         </div>
-                        <div class="auth-security-row">
-                            <div class="auth-security-dot"></div>
-                            Your data is encrypted &bull; Privacy protected
-                        </div>
                         <div class="auth-form-body">
                             <form id="registerFormElement" novalidate>
                                 <input type="hidden" id="registerRole" value="user">
                                 <div class="form-group">
-                                    <label for="regName">Full Name</label>
-                                    <input type="text" id="regName" required placeholder="Enter your full name" autocomplete="name">
+                                    <label for="regName">👤 Full Name *</label>
+                                    <input type="text" id="regName" required placeholder="Enter your full name">
                                     <span class="error-message"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label for="regPhone">Phone Number</label>
-                                    <input type="tel" id="regPhone" required pattern="[0-9]{10}" maxlength="10" placeholder="10 digit number" autocomplete="tel">
+                                    <label for="regPhone">📱 Phone Number *</label>
+                                    <input type="tel" id="regPhone" required pattern="[0-9]{10}" maxlength="10" placeholder="10 digit number">
                                     <span class="error-message"></span>
                                 </div>
                                 <div class="form-group">
-                                    <label for="regPassword">Password</label>
-                                    <input type="password" id="regPassword" required minlength="6" placeholder="Min 6 characters" autocomplete="new-password">
+                                    <label for="regPassword">🔑 Password *</label>
+                                    <input type="password" id="regPassword" required minlength="6" placeholder="Min 6 characters">
                                     <span class="error-message"></span>
                                 </div>
-                                <button type="submit" class="btn-primary">&#8594; Create Account</button>
+                                <button type="submit" class="btn-primary">→ Create Account</button>
                             </form>
                             <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Sign In</a></p>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
 
-        <!-- ADMIN PANEL -->
+        <!-- Admin Auth Panel -->
         <div class="auth-right" id="adminAuthPanel" style="display:none;">
             <div class="auth-container admin-theme">
-                <button class="auth-back-btn" onclick="showPortal()">&#8592; Back to Portal</button>
+                <button class="auth-back-btn" onclick="showPortal()">← Back</button>
                 <div class="auth-card">
                     <div class="auth-card-accent"></div>
                     <div class="auth-card-header">
-                        <div class="auth-card-header-icon">&#128272;</div>
+                        <div class="auth-card-header-icon">🔐</div>
                         <div class="auth-card-header-text">
                             <h2>Admin Access</h2>
                             <p>Restricted to authorized personnel only</p>
                         </div>
                     </div>
-                    <div class="auth-security-row">
-                        <div class="auth-security-dot"></div>
-                        High-security zone &bull; All access logged
-                    </div>
                     <div class="auth-form-body">
-                        <div class="admin-badge">&#128737;&#65039; Secure Admin Authentication</div>
+                        <div class="admin-badge">🛡️ Secure Admin Login</div>
                         <form id="adminLoginFormElement" novalidate>
                             <input type="hidden" id="adminLoginRole" value="admin">
                             <div class="form-group">
-                                <label>Admin Username</label>
-                                <input type="text" id="adminLoginName" required placeholder="Enter admin username" autocomplete="username">
+                                <label>👤 Admin Username</label>
+                                <input type="text" id="adminLoginName" required placeholder="Enter admin username">
                                 <span class="error-message"></span>
                             </div>
                             <div class="form-group">
-                                <label>Admin Password</label>
-                                <input type="password" id="adminLoginPassword" required placeholder="Enter admin password" autocomplete="current-password">
+                                <label>🔑 Admin Password</label>
+                                <input type="password" id="adminLoginPassword" required placeholder="Enter admin password">
                                 <span class="error-message"></span>
                             </div>
                             <div class="form-group">
-                                <label>Security CAPTCHA</label>
+                                <label>Enter CAPTCHA *</label>
                                 <div class="captcha-container">
                                     <div class="captcha-code" id="adminCaptchaCode"></div>
-                                    <button type="button" id="adminRefreshCaptcha" style="background:linear-gradient(135deg,#d97706,#dc2626);border:none;color:white;padding:0 16px;border-radius:14px;cursor:pointer;font-size:1.1rem;height:50px;flex-shrink:0;box-shadow:0 4px 15px rgba(245,158,11,0.4);">&#128260;</button>
+                                    <button type="button" id="adminRefreshCaptcha" style="background:linear-gradient(135deg,#f59e0b,#ef4444);border:none;color:white;padding:0 14px;border-radius:12px;cursor:pointer;font-size:1.2rem;height:46px;flex-shrink:0;">🔄</button>
                                 </div>
-                                <input type="text" id="adminCaptchaInput" required placeholder="Enter the code above" autocomplete="off">
+                                <input type="text" id="adminCaptchaInput" required placeholder="Type the code above">
                                 <span class="error-message"></span>
                             </div>
-                            <button type="submit" class="btn-primary">&#128272; Authenticate &amp; Enter</button>
+                            <button type="submit" class="btn-primary">🔐 Secure Login</button>
                         </form>
                     </div>
                 </div>
@@ -294,11 +268,11 @@
             <div style="max-width:560px; margin:-1.5rem auto 2rem; position:relative; z-index:99999;">
                 <span style="position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:1.1rem; z-index:2;">🔍</span>
                 <input type="text" id="globalSearch" placeholder="Search pages, places, issues, services..." autocomplete="off"
-                    style="width:100%; padding:0.85rem 1rem 0.85rem 2.8rem; border:2px solid var(--border); border-radius:25px; font-size:0.95rem; background:var(--bg-card); color:var(--text-primary); outline:none; box-shadow:var(--shadow); transition:all 0.3s ease;"
+                    style="width:100%; padding:0.85rem 1rem 0.85rem 2.8rem; border:2px solid #e2e8f0; border-radius:25px; font-size:0.95rem; background:#ffffff; color:#1e293b; outline:none; box-shadow:0 4px 20px rgba(0,0,0,0.12); transition:all 0.3s ease;"
                     oninput="globalSearchFn(this.value)"
-                    onfocus="this.style.borderColor='var(--accent)'; globalSearchFn(this.value)"
-                    onblur="this.style.borderColor=''; setTimeout(()=>closeGlobalSearch(),200)">
-                <div id="globalSearchResults" style="display:none; position:absolute; top:calc(100% + 8px); left:0; right:0; background:var(--bg-card); border-radius:16px; box-shadow:var(--shadow); z-index:99999; overflow:hidden; border:2px solid var(--border); max-height:380px; overflow-y:auto;"></div>
+                    onfocus="this.style.borderColor='#6366f1'; this.style.boxShadow='0 4px 20px rgba(99,102,241,0.25)'; globalSearchFn(this.value)"
+                    onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.12)'; setTimeout(()=>closeGlobalSearch(),200)">
+                <div id="globalSearchResults" style="display:none; position:absolute; top:calc(100% + 8px); left:0; right:0; background:#fff; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.25); z-index:99999; overflow:hidden; border:2px solid #e2e8f0; max-height:380px; overflow-y:auto;"></div>
             </div>
 
         <div class="stats-grid">
@@ -811,7 +785,7 @@
                                 <option value="medium">Medium</option>
                                 <option value="low">Low</option>
                             </select>
-                            <input type="text" id="searchIssues" placeholder="🔍 Search issues..." oninput="renderAdminPanel()" style="padding:0.5rem 1rem;border:2px solid var(--border);border-radius:8px;font-size:0.85rem;background:var(--input-bg);color:var(--text-primary);">
+                            <input type="text" id="searchIssues" placeholder="🔍 Search issues..." oninput="renderAdminPanel()" style="padding:0.5rem 1rem;border:2px solid #e2e8f0;border-radius:8px;font-size:0.85rem;">
                             <button class="btn-secondary" onclick="exportIssuesCSV()" style="white-space:nowrap;">📅 Export CSV</button>
                         </div>
                     </div>
