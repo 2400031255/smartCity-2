@@ -883,12 +883,12 @@ window.showSuggestions = function(searchText) {
 
     box.innerHTML = matches.map(p => `
         <div onclick="selectSuggestion('${sanitizeHTML(p.name)}')"
-            style="display:flex; align-items:center; gap:14px; padding:12px 18px; cursor:pointer; transition:background 0.2s; border-bottom:1px solid #f1f5f9; background: white;"
-            onmouseover="this.style.background='#f0f4ff'" onmouseout="this.style.background='white'">
+            style="display:flex; align-items:center; gap:14px; padding:12px 18px; cursor:pointer; transition:background 0.2s; border-bottom:1px solid var(--border); background: var(--bg-card);"
+            onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='var(--bg-card)'">
             <span style="font-size:2rem; min-width:40px; text-align:center;">${p.icon}</span>
             <div style="flex:1;">
-                <div style="font-weight:700; color:#1e293b; font-size:0.95rem; margin-bottom:2px;">${highlightMatch(p.name, search)}</div>
-                <div style="font-size:0.8rem; color:#64748b;">📍 ${p.address}</div>
+                <div style="font-weight:700; color:var(--text-primary); font-size:0.95rem; margin-bottom:2px;">${highlightMatch(p.name, search)}</div>
+                <div style="font-size:0.8rem; color:var(--text-secondary);">📍 ${p.address}</div>
             </div>
             <span style="font-size:0.75rem; color:#6366f1; font-weight:600; background:#e0e7ff; padding:3px 8px; border-radius:20px;">View</span>
         </div>
@@ -2689,19 +2689,19 @@ window.globalSearchFn = function(query) {
     const all = [...results, ...placeResults, ...issueResults].slice(0, 8);
 
     if (all.length === 0) {
-        box.innerHTML = `<div style="padding:1.2rem; text-align:center; color:#64748b; font-size:0.9rem;">🔍 No results for "${sanitizeHTML(query)}"</div>`;
+        box.innerHTML = `<div style="padding:1.2rem; text-align:center; color:var(--text-secondary); font-size:0.9rem;">🔍 No results for "${sanitizeHTML(query)}"</div>`;
         box.style.display = 'block';
         return;
     }
 
     box.innerHTML = all.map(item => `
         <div onclick="navigateTo('${item.page}'); closeGlobalSearch(); document.getElementById('globalSearch').value=''; window.scrollTo(0,0);"
-            style="display:flex; align-items:center; gap:14px; padding:12px 18px; cursor:pointer; border-bottom:1px solid #f1f5f9; background:white; transition:background 0.15s;"
-            onmouseover="this.style.background='#f5f7ff'" onmouseout="this.style.background='white'">
+            style="display:flex; align-items:center; gap:14px; padding:12px 18px; cursor:pointer; border-bottom:1px solid var(--border); background:var(--bg-card); transition:background 0.15s;"
+            onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='var(--bg-card)'">
             <span style="font-size:1.6rem; min-width:36px; text-align:center;">${item.icon}</span>
             <div style="flex:1;">
-                <div style="font-weight:700; color:#1e293b; font-size:0.92rem;">${highlightMatch(item.title, q)}</div>
-                <div style="font-size:0.78rem; color:#64748b; margin-top:2px;">${sanitizeHTML(item.desc)}</div>
+                <div style="font-weight:700; color:var(--text-primary); font-size:0.92rem;">${highlightMatch(item.title, q)}</div>
+                <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:2px;">${sanitizeHTML(item.desc)}</div>
             </div>
             <span style="font-size:0.72rem; background:#e0e7ff; color:#6366f1; padding:3px 10px; border-radius:20px; font-weight:600; white-space:nowrap;">Go →</span>
         </div>
@@ -3340,9 +3340,9 @@ function _renderSuggestionsDefault() {
         <div class="map-suggest-label">Quick Categories</div>
         <div style="display:flex;flex-wrap:wrap;gap:0.4rem;padding:0.4rem 1rem 0.6rem;">
             ${MAP_CATEGORIES.map(c => `
-            <button onclick="mapPickCategory('${c.query}')" style="display:flex;align-items:center;gap:0.35rem;padding:0.35rem 0.75rem;border:1.5px solid #e2e8f0;border-radius:20px;background:#fff;font-size:0.78rem;font-weight:600;color:#475569;cursor:pointer;transition:all 0.2s;font-family:inherit;"
-                onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1';this.style.background='rgba(99,102,241,0.06)'"
-                onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#475569';this.style.background='#fff'">
+            <button onclick="mapPickCategory('${c.query}')" style="display:flex;align-items:center;gap:0.35rem;padding:0.35rem 0.75rem;border:1.5px solid var(--border);border-radius:20px;background:var(--bg-card);font-size:0.78rem;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all 0.2s;font-family:inherit;"
+                onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)';this.style.background='rgba(99,102,241,0.06)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-secondary)';this.style.background='var(--bg-card)'">
                 ${c.icon} ${c.label}
             </button>`).join('')}
         </div>
