@@ -2131,7 +2131,7 @@ colorOptions.addEventListener('click', (e) => {
     e.stopPropagation();
 });
 
-const savedColor = storage.local.get('accentColor', '#10b981');
+const savedColor = storage.local.get('accentColor', '#3b82f6');
 html.style.setProperty('--accent', savedColor);
 html.style.setProperty('--accent-hover', adjustColor(savedColor, -20));
 setAccentRGB(savedColor);
