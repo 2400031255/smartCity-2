@@ -2,12 +2,14 @@
    AUTH SCREEN — Vibrant City Night Design
 ═══════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 .auth-screen {
     display: flex;
     min-height: 100vh;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
     position: relative;
     overflow: hidden;
     background: #000;
