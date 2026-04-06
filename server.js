@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'smart-city-secret-key-2024';
 
 app.use(cors());
@@ -14,11 +14,11 @@ app.use(express.static(__dirname));
 
 // MySQL Connection Pool
 const db = mysql.createPool({
-    host: '127.0.0.1',
-    port: 3306,
-    user: 'root',
-    password: 'nikhil140218',
-    database: 'smartcity',
+    host: process.env.MYSQLHOST || '127.0.0.1',
+    port: process.env.MYSQLPORT || 3306,
+    user: process.env.MYSQLUSER || 'root',
+    password: process.env.MYSQLPASSWORD || 'nikhil140218',
+    database: process.env.MYSQLDATABASE || 'smartcity',
     waitForConnections: true,
     connectionLimit: 10
 });

@@ -4,7 +4,9 @@ const navLinks = document.querySelectorAll('.nav-link');
 const pages = document.querySelectorAll('.page');
 
 // ── API Helper ──────────────────────────────────
-const API = 'http://localhost:3000/api';
+const API = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000/api'
+    : 'https://YOUR-APP.railway.app/api';
 
 function getToken() { return localStorage.getItem('authToken'); }
 function setToken(t) { localStorage.setItem('authToken', t); }
