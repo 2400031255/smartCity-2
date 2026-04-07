@@ -395,5 +395,6 @@ initDB().then(() => {
     app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
 }).catch(err => {
     console.error('❌ DB init failed:', err.message);
+    console.error('Make sure MySQL env variables are set: MYSQLHOST, MYSQLPORT, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE');
     process.exit(1);
 });
