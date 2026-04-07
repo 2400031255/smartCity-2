@@ -18,13 +18,14 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', time: new Date() }
 
 // MySQL Connection Pool
 const db = mysql.createPool({
-    host: process.env.MYSQLHOST || '127.0.0.1',
-    port: process.env.MYSQLPORT || 3306,
-    user: process.env.MYSQLUSER || 'root',
-    password: process.env.MYSQLPASSWORD || 'nikhil140218',
-    database: process.env.MYSQLDATABASE || 'smartcity',
+    host: process.env.MYSQLHOST || process.env.MYSQL_HOST || '127.0.0.1',
+    port: process.env.MYSQLPORT || process.env.MYSQL_PORT || 3306,
+    user: process.env.MYSQLUSER || process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQLPASSWORD || process.env.MYSQL_PASSWORD || 'nikhil140218',
+    database: process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || process.env.MYSQL_DB || 'smartcity',
     waitForConnections: true,
-    connectionLimit: 10
+    connectionLimit: 10,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 const pool = db.promise();
@@ -33,15 +34,16 @@ const pool = db.promise();
 async function initDB() {
     // Connect without database first to create it
     const tempConn = mysql.createConnection({
-        host: '127.0.0.1',
-        port: 3306,
-        user: 'root',
-        password: 'nikhil140218'
+        host: process.env.MYSQLHOST || process.env.MYSQL_HOST || '127.0.0.1',
+        port: process.env.MYSQLPORT || process.env.MYSQL_PORT || 3306,
+        user: process.env.MYSQLUSER || process.env.MYSQL_USER || 'root',
+        password: process.env.MYSQLPASSWORD || process.env.MYSQL_PASSWORD || 'nikhil140218'
     }).promise();
 
-    await tempConn.query('CREATE DATABASE IF NOT EXISTS smartcity');
+    const dbName = process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE || process.env.MYSQL_DB || 'smartcity';
+    await tempConn.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
     await tempConn.end();
-    console.log('✅ Database "smartcity" ready');
+    console.log(`✅ Database "${dbName}" ready`);
 
     await pool.query(`CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
