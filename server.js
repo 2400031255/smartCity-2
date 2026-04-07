@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = process.env.PORT || process.env.RAILWAY_PORT || 3000;
+const PORT = process.env.PORT || process.env.RAILWAY_PORT || 8080;
 console.log('Starting server with PORT:', PORT);
 console.log('ENV vars:', {
     MYSQLHOST: process.env.MYSQLHOST ? 'SET' : 'NOT SET',
