@@ -5,7 +5,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || process.env.RAILWAY_PORT || 3000;
+console.log('Starting server with PORT:', PORT);
+console.log('ENV vars:', {
+    MYSQLHOST: process.env.MYSQLHOST ? 'SET' : 'NOT SET',
+    MYSQLPORT: process.env.MYSQLPORT ? 'SET' : 'NOT SET',
+    MYSQLUSER: process.env.MYSQLUSER ? 'SET' : 'NOT SET',
+    MYSQLPASSWORD: process.env.MYSQLPASSWORD ? 'SET' : 'NOT SET',
+    MYSQLDATABASE: process.env.MYSQLDATABASE ? 'SET' : 'NOT SET',
+    NODE_ENV: process.env.NODE_ENV
+});
 const JWT_SECRET = process.env.JWT_SECRET || 'smart-city-secret-key-2024';
 
 app.use(cors());
