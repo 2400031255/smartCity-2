@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --bg-primary: #080c14;
+  --bg-secondary: #0f1623;
+  --bg-card: #111827;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --border: rgba(255,255,255,0.08);
+  --nav-bg: #080c14;
+  --input-bg: #0f1623;
+  --shadow: 0 4px 24px rgba(0,0,0,0.5);
+  --accent-rgb: 59,130,246;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+input, textarea, select, button {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+@media (min-width: 768px) {
+  .report-grid { grid-template-columns: 1fr 280px !important; }
+}
+
+@media (max-width: 480px) {
+  .admin-stats { grid-template-columns: repeat(2, 1fr) !important; }
+  .portal-cards { flex-direction: column !important; align-items: center; }
+  .portal-cards > div { width: 100% !important; max-width: 340px; }
+}
