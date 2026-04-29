@@ -93,31 +93,46 @@
         function handleLogin(event) {
             event.preventDefault();
             
-            const name = document.getElementById('loginName').value;
+            const name = document.getElementById('loginName').value.trim();
             const password = document.getElementById('loginPassword').value;
             const role = document.getElementById('loginRole').value;
             const captchaInput = document.getElementById('captchaInput').value.toUpperCase();
             
             if (captchaInput !== currentCaptcha) {
-                alert('Invalid CAPTCHA');
+                alert('Invalid CAPTCHA. Please try again.');
                 generateCaptcha();
+                document.getElementById('captchaInput').value = '';
+                return false;
+            }
+
+            if (!name || !password) {
+                alert('Please enter your name and password.');
                 return false;
             }
             
-            const users = [
+            // Default built-in users
+            const defaultUsers = [
                 { name: 'srisanth', password: 'SASI@1234', role: 'admin' },
                 { name: 'Admin User', password: 'admin123', role: 'admin' },
-                { name: 'Regular User', password: 'user123', role: 'user' }
+                { name: 'nikhil', password: 'nikhil2006', role: 'admin' },
+                { name: 'Regular User', password: 'user123', role: 'user' },
+                { name: 'nikhil', password: 'nikhil2006', role: 'user' }
             ];
+
+            // Also check users registered via index.html
+            let storedUsers = [];
+            try { storedUsers = JSON.parse(localStorage.getItem('users') || '[]'); } catch(e) {}
+            const allUsers = [...defaultUsers, ...storedUsers];
             
-            const user = users.find(u => u.name === name && u.password === password && u.role === role);
+            const user = allUsers.find(u => u.name === name && u.password === password && u.role === role);
             
             if (user) {
                 localStorage.setItem('currentUser', JSON.stringify(user));
                 window.location.href = 'index.html';
             } else {
-                alert('Invalid credentials for selected login type');
+                alert('Invalid credentials for selected login type.');
                 generateCaptcha();
+                document.getElementById('captchaInput').value = '';
             }
             
             return false;

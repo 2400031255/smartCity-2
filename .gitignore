@@ -32,3 +32,11 @@ dist-ssr/
 springboot/target/
 *.class
 *.jar
+
+# Database files
+*.db
+*.sqlite
+
+# OS files
+.DS_Store
+Thumbs.db
