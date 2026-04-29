@@ -2,7 +2,8 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd springboot && mvn clean package -DskipTests"
+    "buildCommand": "cd springboot && mvn clean package -DskipTests",
+    "watchPatterns": ["springboot/**"]
   },
   "deploy": {
     "startCommand": "java -jar springboot/target/smartcity-api-1.0.0.jar",
