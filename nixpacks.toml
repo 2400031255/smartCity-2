@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["jdk", "maven"]
+
+[phases.build]
+cmds = ["cd springboot && mvn clean package -DskipTests"]
+
+[start]
+cmd = "java -jar springboot/target/smartcity-api-1.0.0.jar"
