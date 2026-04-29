@@ -1,6 +1,3 @@
-[providers]
-# Only use Java provider, skip Node.js entirely
-
 [phases.setup]
 nixPkgs = ["jdk", "maven"]
 
